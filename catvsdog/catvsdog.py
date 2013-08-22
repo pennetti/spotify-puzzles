@@ -1,6 +1,8 @@
 """ Cat vs. Dog
     https://www.spotify.com/us/jobs/tech/catvsdog/
 
+    Maximum Clique Algorithm http://arxiv.org/pdf/1209.5818v4.pdf
+
     Solution by Travis Pennetti"""
 
 import sys # stdin
