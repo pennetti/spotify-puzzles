@@ -28,7 +28,7 @@ class Graph(object):
 
   def __init__(self):
     """Use list because nodes will be enumerated when being connected"""
-    self.nodes = []
+    self.nodes = list()
 
   def add_edge(self, node_1, node_2):
     """Make 'edge' by creating bidirectional relationship between two nodes"""
@@ -51,19 +51,16 @@ class Graph(object):
 def main():
   """Handle input from sys.stdin"""
   test_cases = int(sys.stdin.readline())  # First line is number of test cases
-  for i in range(test_cases):
+  for _ in range(test_cases):
     first_line = sys.stdin.readline().split(' ', 2)
-    first_line = map(int, first_line)
-    cats, dogs, voters = first_line   # First line of each test is c,d,v
+    voters = int(first_line[2])   # Only need number of voters
 
-    # Verify the number of cats, dogs, and voters fit the constraints
-    if cats < 1 or cats > 1000 or \
-    dogs < 1 or dogs > 1000 or \
-    voters < 0 or voters > 500:
+    # Verify the number of voters fits the constraints
+    if voters < 0 or voters > 500:
       return
 
     # Add all votes to a list to be processed
-    votes = []
+    votes = []  # May be duplicate votes, can't use set
     for j in range(voters):
       votes.append(sys.stdin.readline())
 
@@ -91,11 +88,11 @@ def max_clique(graph):
     if len(node.neighbors) >= _max: # Pruning, if the current node has fewer
                                     # neighbors than the max clique, it cannot
                                     # be part of a larger clique
-      neighbor_list = []
+      neighbor_list = set()
       for neighbor in node.neighbors:
         if neighbor._id > node._id: # Don't repeat nodes already seen
           if len(neighbor.neighbors) > _max:  # Pruning, same as above
-            neighbor_list.append(neighbor)
+            neighbor_list.add(neighbor)
       _max = clique(graph, neighbor_list, _max, 1) # 1 is the smallest clique
   return _max
 
@@ -107,23 +104,21 @@ def clique(graph, neighbor_list, max_size, clique_size):
       max_size = clique_size
     return max_size
   while len(neighbor_list) > 0:
-    if (clique_size + len(neighbor_list)) <= max_size: #Pruning, if all nodes in
-                                    # neighbor_list were added to the clique,
-                                    # would it be bigger than the max found?
+    # Pruning, if all nodes in neighbor_list were added to the clique, would it
+    # be bigger than the max found?
+    if (clique_size + len(neighbor_list)) <= max_size:
       return max_size
 
-    # Remove a node from the neighbor list
-    temp_node = neighbor_list[0]
-    neighbor_list.remove(neighbor_list[0])
+    temp_node = neighbor_list.pop() # Remove a node from the neighbor list
 
     # Pruning, all remaining nodes with neighbor lists larger than max and share
     # neighbors with the removed node
-    new_neighbors = []
+    new_neighbors = set()
     for node in temp_node.neighbors:
       if node in temp_node.neighbors and \
       node in neighbor_list and \
       len(node.neighbors) >= max_size:
-        new_neighbors.append(node)
+        new_neighbors.add(node)
     max_size = clique(graph, new_neighbors, max_size, clique_size+1)
   return max_size
 
